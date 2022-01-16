@@ -70,13 +70,22 @@ func main() {
 
 	updatedU1, err = client.User.Query().
 		Where(user.ID(u1.ID)).
-		WithOutgoingFriendRequests().
-		WithIncomingFriendRequests().
+		WithFriends().
 		First(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if len(updatedU1.Edges.Friends) != 1 {
 		log.Fatalf("expected u1 to have 1 friend: %v", updatedU1.Edges)
+	}
+	updatedU2, err := client.User.Query().
+		Where(user.ID(u2.ID)).
+		WithFriends().
+		First(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(updatedU2.Edges.Friends) != 1 {
+		log.Fatalf("expected u2 to have 1 friend: %v", updatedU2.Edges)
 	}
 }
