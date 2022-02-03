@@ -74,18 +74,16 @@ func (FriendRequest) Hooks() []ent.Hook {
 							return nil, errors.New("destination_id field is missing")
 						}
 
-						source, err := m.Client().User.Get(ctx, sourceID)
+						tx, err := m.Client().Tx(ctx)
 						if err != nil {
 							return nil, err
 						}
 
-						destination, err := m.Client().User.Get(ctx, destinationID)
-						if err != nil {
+						if err := tx.User.UpdateOneID(sourceID).AddFriendIDs(destinationID).Exec(ctx); err != nil {
 							return nil, err
 						}
 
-						err = m.Client().User.UpdateOne(source).AddFriends(destination).Exec(ctx)
-						if err != nil {
+						if err := tx.Commit(); err != nil {
 							return nil, err
 						}
 					}
